@@ -4,9 +4,8 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
 
 // Pages
-import HomePage from '@/pages/home';
+import HomePage from '@/pages/Home';
 import LoginPage from '@/pages/Login';
-import ProfilePage from '@/pages/Profile';
 
 // Configure dayjs
 dayjs.locale('vi');
@@ -18,7 +17,6 @@ const App: React.FC = () => {
         {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
 
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
