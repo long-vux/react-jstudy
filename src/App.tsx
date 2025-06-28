@@ -5,7 +5,7 @@ import 'dayjs/locale/vi';
 
 // Pages
 import HomePage from '@/pages/Home';
-import LoginPage from '@/pages/Login';
+import LoginPage from '@/pages/LoginForm';
 
 // Configure dayjs
 dayjs.locale('vi');
