@@ -9,6 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import HomePage from '@/pages/Home';
 import LoginForm from '@/pages/LoginForm';
 import RegisterForm from '@/pages/RegisterForm';
+import VerifyEmailHandler from '@/pages/VerifyEmailHandler';
 
 // Configure dayjs
 dayjs.locale('vi');
@@ -33,7 +34,9 @@ const App: React.FC = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
+        <Route path="/verify-email/:userId/:code" element={<VerifyEmailHandler />} />
 
+        {/* Redirect to home if no match */}
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

@@ -5,7 +5,6 @@ import { useAppDispatch, useAppSelector } from '@/hooks';
 import { register } from '@/features/user/userSlice';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const { Title, Text } = Typography;
 

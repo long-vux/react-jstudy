@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Card, Typography, Row, Col } from 'antd';
 import { GoogleOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { login } from '@/features/user/userSlice';
 import { useNavigate } from 'react-router-dom';
-
+import { toast } from 'react-toastify';
 const { Title, Text } = Typography;
 
 const LoginForm = () => {
@@ -18,10 +18,18 @@ const LoginForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = await dispatch(login({ email, password }));
+
     if (login.fulfilled.match(result)) {
       navigate('/');
     }
   };
+
+  useEffect(() => {
+    if (error?.includes('verify')) {
+      toast.info(error); // Show info toast for email verification
+    }
+  }, [error]);
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -59,15 +67,15 @@ const LoginForm = () => {
                   {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
                 </span>
               </div>
-              {error && <Text type="danger">{error}</Text>}
+              {!error?.includes('verify') && <Text type="danger">{error}</Text>}
               <div className="flex justify-between items-center">
-                  <a href="/reset-password" className="text-blue-600 hover:underline">
-                    Quên mật khẩu?
-                  </a>
-                  <a href="/register" className="text-blue-600 hover:underline">
-                    Đăng ký tài khoản mới
-                  </a>
-                </div>
+                <a href="/reset-password" className="text-blue-600 hover:underline">
+                  Quên mật khẩu?
+                </a>
+                <a href="/register" className="text-blue-600 hover:underline">
+                  Đăng ký tài khoản mới
+                </a>
+              </div>
               <Button className="h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200 ease-in-out" type="primary" htmlType="submit" block loading={loading}>
                 Đăng nhập
               </Button>
@@ -80,17 +88,17 @@ const LoginForm = () => {
               <div className="border-t border-gray-300 w-full"></div>
             </div>
 
-             <Button
-                icon={<GoogleOutlined />}
-                // onClick={() => handleSocialLogin('google')}
-                block
-                size="large"
-                className="h-12 border-red-200 text-red-600 hover:border-red-400 hover:text-red-700"
-                style={{ borderRadius: '8px' }}
-              >
-                Tiếp tục với Google
-              </Button>
-            
+            <Button
+              icon={<GoogleOutlined />}
+              // onClick={() => handleSocialLogin('google')}
+              block
+              size="large"
+              className="h-12 border-red-200 text-red-600 hover:border-red-400 hover:text-red-700"
+              style={{ borderRadius: '8px' }}
+            >
+              Tiếp tục với Google
+            </Button>
+
           </Card>
         </Col>
       </Row>
