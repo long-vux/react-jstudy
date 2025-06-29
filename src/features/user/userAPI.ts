@@ -10,3 +10,8 @@ export const registerAPI = async (fullName: string, email: string, password: str
   return res.data; // contains message
 };
 
+export const fetchUserProfileAPI = async (id: string) => {
+  const res = await axiosClient.get(`/user/${id}`);
+  return res.data; // contains user profile
+};
+

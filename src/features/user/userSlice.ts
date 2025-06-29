@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { loginAPI, registerAPI } from './userAPI';
+import { loginAPI, registerAPI, fetchUserProfileAPI } from './userAPI';
 
 interface Profile {
   fullName: string;
@@ -66,6 +66,29 @@ export const register = createAsyncThunk(
     }
   }
 );
+
+export const fetchUserProfile = createAsyncThunk(
+  'user/fetchProfile',
+  async (_, thunkAPI) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return thunkAPI.rejectWithValue('No token found');
+    }
+
+
+    const userId = JSON.parse(atob(token.split('.')[1])).id;
+    console.log('Fetching profile for user ID:', userId);
+
+    try {
+      const res = await fetchUserProfileAPI(userId);
+      console.log('Fetched user profile:', res.user);
+      return res.data;
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
 
 // Create a slice for user state management
 const userSlice = createSlice({
