@@ -91,7 +91,7 @@ const RegisterForm = () => {
                             {error && <Text type="danger">{error}</Text>}
                             {registerMessage && <Text type="success">{registerMessage}</Text>}
                             <div className="flex justify-between items-center">
-                                <a href="/reset-password" className="text-blue-600 hover:underline">
+                                <a href="/forgot-password" className="text-blue-600 hover:underline">
                                     Quên mật khẩu?
                                 </a>
                                 <a href="/login" className="text-blue-600 hover:underline">

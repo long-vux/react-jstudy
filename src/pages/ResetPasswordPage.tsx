@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Input, Button, Typography, message } from 'antd';
+import { Card, Input, Button, Typography } from 'antd';
 import axios from 'axios';
+import {toast} from 'react-toastify';
 
 const { Title } = Typography;
 
@@ -22,10 +23,13 @@ const ResetPasswordPage = () => {
                 otp,
                 newPassword,
             });
-            message.success(res.data.message || 'Đặt lại mật khẩu thành công!');
-            navigate('/login');
+            toast.success(res.data.message || 'Đặt lại mật khẩu thành công!');
+            // set time out to allow user to read the message
+            setTimeout(() => {
+                navigate('/login');
+            }, 2000);
         } catch (err: any) {
-            message.error(err.response?.data?.message || 'Lỗi đặt lại mật khẩu');
+            toast.error(err.response?.data?.message || 'Lỗi đặt lại mật khẩu');
         } finally {
             setLoading(false);
         }
