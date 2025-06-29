@@ -61,7 +61,7 @@ const VerifyEmailHandler = () => {
           </Paragraph>
         }
         extra={
-          <Button type="primary" onClick={() => navigate('/login')}>
+          <Button type="primary" onClick={() => navigate('/auth/login')}>
             Đến trang đăng nhập
           </Button>
         }

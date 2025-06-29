@@ -6,8 +6,9 @@ import { login } from '@/features/user/userSlice';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 const { Title, Text } = Typography;
+import BackHomeButton from '@/components/ui/BackHomeButton';
 
-const LoginForm = () => {
+const LoginPage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { loading, error } = useAppSelector((state) => state.user);
@@ -33,6 +34,7 @@ const LoginForm = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <BackHomeButton />
       <Row justify="center" className="w-full">
         <Col xs={24} sm={20} md={16} lg={12} xl={8}>
           <Card className="shadow-2xl border-0" style={{ borderRadius: '16px' }}>
@@ -69,10 +71,10 @@ const LoginForm = () => {
               </div>
               {!error?.includes('verify') && <Text type="danger">{error}</Text>}
               <div className="flex justify-between items-center">
-                <a href="/forgot-password" className="text-blue-600 hover:underline">
+                <a href="/auth/forgot-password" className="text-blue-600 hover:underline">
                   Quên mật khẩu?
                 </a>
-                <a href="/register" className="text-blue-600 hover:underline">
+                <a href="/auth/register" className="text-blue-600 hover:underline">
                   Đăng ký tài khoản mới
                 </a>
               </div>
@@ -106,4 +108,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default LoginPage;
