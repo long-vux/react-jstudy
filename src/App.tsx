@@ -10,6 +10,8 @@ import HomePage from '@/pages/Home';
 import LoginForm from '@/pages/LoginForm';
 import RegisterForm from '@/pages/RegisterForm';
 import VerifyEmailHandler from '@/pages/VerifyEmailHandler';
+import  ResetPasswordPage from '@/pages/ResetPasswordPage';
+import ForgotPasswordForm from '@/pages/ForgotPasswordForm';
 
 // Configure dayjs
 dayjs.locale('vi');
@@ -35,6 +37,8 @@ const App: React.FC = () => {
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/verify-email/:userId/:code" element={<VerifyEmailHandler />} />
+        <Route path="/forgot-password" element={<ForgotPasswordForm />} />
+        <Route path="/reset-password/:userId" element={<ResetPasswordPage />} />
 
         {/* Redirect to home if no match */}
         {/* Catch all route */}

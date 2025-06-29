@@ -69,7 +69,7 @@ const LoginForm = () => {
               </div>
               {!error?.includes('verify') && <Text type="danger">{error}</Text>}
               <div className="flex justify-between items-center">
-                <a href="/reset-password" className="text-blue-600 hover:underline">
+                <a href="/forgot-password" className="text-blue-600 hover:underline">
                   Quên mật khẩu?
                 </a>
                 <a href="/register" className="text-blue-600 hover:underline">
