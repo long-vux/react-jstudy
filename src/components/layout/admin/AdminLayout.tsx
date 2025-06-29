@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
-import AdminLayout from '@/components/layout/AdminLayout';
+import AdminLayout from '@/components/layout/admin/AdminLayout';
 
 // Dummy admin page
 const AdminDashboard = () => <div>Admin Dashboard</div>;
