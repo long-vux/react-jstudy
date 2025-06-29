@@ -1,15 +1,15 @@
-// === src/features/user/RegisterForm.tsx ===
+// === src/pages/auth/RegisterPage.tsx ===
 import React, { useState, useEffect } from 'react';
+import BackHomeButton from '@/components/ui/BackHomeButton';
 import { Button, Card, Typography, Row, Col, message } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { register } from '@/features/user/userSlice';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const { Title, Text } = Typography;
 
-const RegisterForm = () => {
+const RegisterPage = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const { loading, error, registerMessage } = useAppSelector((state) => state.user);
@@ -24,14 +24,14 @@ const RegisterForm = () => {
         const result = await dispatch(register({ fullName, email, password, username }));
         if (register.fulfilled.match(result)) {
             message.success(result.payload);
-            navigate('/login');
+            navigate('/auth/login');
         }
     };
 
     useEffect(() => {
         if (registerMessage) {
             toast.success(registerMessage);
-            navigate('/login');
+            navigate('/auth/login');
         }
     }, [registerMessage, navigate]);
 
@@ -41,6 +41,8 @@ const RegisterForm = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+                  <BackHomeButton />
+
             <Row justify="center" className="w-full">
                 <Col xs={24} sm={20} md={16} lg={12} xl={8}>
                     <Card className="shadow-2xl border-0" style={{ borderRadius: '16px' }}>
@@ -92,10 +94,10 @@ const RegisterForm = () => {
                             {error && <Text type="danger">{error}</Text>}
                             {registerMessage && <Text type="success">{registerMessage}</Text>}
                             <div className="flex justify-between items-center">
-                                <a href="/reset-password" className="text-blue-600 hover:underline">
+                                <a href="/auth/forgot-password" className="text-blue-600 hover:underline">
                                     Quên mật khẩu?
                                 </a>
-                                <a href="/login" className="text-blue-600 hover:underline">
+                                <a href="/auth/login" className="text-blue-600 hover:underline">
                                     Bạn đã có tài khoản?
                                 </a>
                             </div>
@@ -110,4 +112,4 @@ const RegisterForm = () => {
     );
 };
 
-export default RegisterForm;
+export default RegisterPage;

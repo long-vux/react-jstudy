@@ -4,41 +4,38 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import MainRoutes from '@/routes/MainRoutes';
+import AdminRoutes from '@/routes/AdminRoutes';
+import AuthRoutes from './routes/AuthRoutes';
 
-// Pages
-import HomePage from '@/pages/Home';
-import LoginForm from '@/pages/LoginForm';
-import RegisterForm from '@/pages/RegisterForm';
-
-// Configure dayjs
 dayjs.locale('vi');
 
-const App: React.FC = () => {
-  return (
-    <Router>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
+const App: React.FC = () => (
+  <Router>
+    <ToastContainer
+      position="top-right"
+      autoClose={3000}
+      hideProgressBar={false}
+      newestOnTop
+      closeOnClick
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme="light"
+    />
+    <Routes>
+      {/* Main routes */}
+      <Route path="/*" element={<MainRoutes />} />
+      {/* Admin routes */}
+      <Route path="/admin/*" element={<AdminRoutes />} />
 
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/register" element={<RegisterForm />} />
-
-        {/* Catch all route */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
-  );
-};
+      {/* Auth routes */}
+      <Route path="/auth/*" element={<AuthRoutes />} />
+      
+      {/* Catch all */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  </Router>
+);
 
 export default App;
