@@ -1,37 +1,53 @@
-import { HomeOutlined, BookOutlined, TrophyOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { HomeFilled, BookFilled, TrophyFilled } from '@ant-design/icons';
+import { useLocation } from 'react-router-dom';
 
-const Sidebar = ({ collapsed, setCollapsed }: { collapsed: boolean; setCollapsed: (v: boolean) => void }) => {
+const Sidebar = () => {
+  const location = useLocation();
+  const currentPath = location.pathname;
+
+  const navItems = [
+    { path: '/', icon: <HomeFilled className="text-2xl" />, label: 'Trang chủ' },
+    { path: '/ranking', icon: <TrophyFilled className="text-2xl" />, label: 'Xếp hạng' },
+    { path: '/lessons', icon: <BookFilled className="text-2xl" />, label: 'Bài học' },
+  ];
+
   return (
-    <aside
-      className={`bg-gray-100 h-full transition-all duration-300 shadow-inner ${
-        collapsed ? 'w-16' : 'w-56'
-      }`}
-    >
-      <div className="flex items-center justify-between p-4">
-        {!collapsed && <span className="font-bold">Menu</span>}
-        <button onClick={() => setCollapsed(!collapsed)}>
-          {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-        </button>
-      </div>
-      <ul className="space-y-2 px-2">
-        <li>
-          <a href="/" className="flex items-center gap-2 text-gray-700 hover:text-blue-600">
-            <HomeOutlined />
-            {!collapsed && 'Trang chủ'}
-          </a>
-        </li>
-        <li>
-          <a href="/ranking" className="flex items-center gap-2 text-gray-700 hover:text-blue-600">
-            <TrophyOutlined />
-            {!collapsed && 'Xếp hạng'}
-          </a>
-        </li>
-        <li>
-          <a href="/lessons" className="flex items-center gap-2 text-gray-700 hover:text-blue-600">
-            <BookOutlined />
-            {!collapsed && 'Bài học'}
-          </a>
-        </li>
+    <aside className={`h-full transition-all duration-300`}>
+      <ul className="space-y-2 p-4">
+        {navItems.map((item) => {
+          const isActive = currentPath === item.path;
+          return (
+            <li
+              key={item.path}
+              className={
+                isActive
+                  ? 'p-4 py-4 text-center rounded-3xl bg-gray-200'
+                  : 'p-4 py-4 text-center rounded-3xl bg-transparent hover:bg-gray-100 group transition'
+              }
+            >
+              <a
+                href={item.path}
+                className={
+                  isActive
+                    ? 'flex flex-col items-center gap-2 text-black'
+                    : 'flex flex-col items-center gap-2 text-gray-500 group-hover:text-black transition'
+                }
+              >
+                {/* Icon */}
+                <span
+                  className={
+                    isActive
+                      ? 'text-2xl text-black'
+                      : 'text-2xl text-gray-500 group-hover:text-black transition'
+                  }
+                >
+                  {item.icon}
+                </span>
+                <span className="text-sm font-semibold">{item.label}</span>
+              </a>
+            </li>
+          );
+        })}
       </ul>
     </aside>
   );
