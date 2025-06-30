@@ -42,7 +42,7 @@ const LessonSidebar = () => {
     <Menu
       mode="inline"
       items={menuItems}
-      onClick={({ key }) => navigate(`/learn/${key}`)}
+      onClick={({ key }) => navigate(`/lessons/${key}`)}
       style={{ height: '100%' }}
     />
   );

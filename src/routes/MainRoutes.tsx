@@ -12,7 +12,7 @@ const MainRoutes = () => (
     </Route>
     
     <Route path="/lessons" element={<LessonLayout />}>
-      <Route index element={<LessonPage />} />
+      <Route path=":slug" element={<LessonPage />} />
     </Route>
 
   </Routes>
