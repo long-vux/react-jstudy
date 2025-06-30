@@ -25,6 +25,7 @@ const App: React.FC = () => {
   return (
     <Router>
       <ToastContainer
+        className="toast-container mt-16"
         position="top-right"
         autoClose={3000}
         hideProgressBar={false}

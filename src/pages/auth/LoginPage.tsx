@@ -21,7 +21,10 @@ const LoginPage = () => {
     const result = await dispatch(login({ email, password }));
 
     if (login.fulfilled.match(result)) {
-      navigate('/');
+      setTimeout(() => {
+        toast.success('Đăng nhập thành công!');
+        navigate('/');
+      }, 1000);
     }
   };
 
