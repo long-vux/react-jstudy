@@ -5,6 +5,7 @@ export const getExerciseById = createAsyncThunk(
   'exercise/fetchById',
   async (id: string) => {
     const res = await exerciseAPI.fetchExerciseById(id);
+    console.log(res)
     return res;
   }
 );

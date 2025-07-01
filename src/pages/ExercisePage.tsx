@@ -2,20 +2,25 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { getExerciseById, submitCode } from '@/features/exercise/exerciseSlice';
+import { fetchCommentsByExerciseId } from '@/features/comment/commentSlice';
 import Editor from '@monaco-editor/react';
-import { Button, Card, Spin } from 'antd';
+import { Button, Card, Spin, Avatar } from 'antd';
 
 const ExercisePage = () => {
   const { id } = useParams();
   const dispatch = useAppDispatch();
   const { current, loading } = useAppSelector((state) => state.exercise);
+  const { comments } = useAppSelector((state) => state.comment);
 
   const [code, setCode] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [results, setResults] = useState<any[]>([]);
 
   useEffect(() => {
-    if (id) dispatch(getExerciseById(id));
+    if (id) {
+      dispatch(getExerciseById(id));
+      dispatch(fetchCommentsByExerciseId(id));
+    }
   }, [id, dispatch]);
 
   useEffect(() => {
@@ -78,6 +83,36 @@ const ExercisePage = () => {
           ))}
         </div>
       )}
+
+      <div className="mt-10">
+        <h3 className="text-lg font-semibold mb-4">Bình luận:</h3>
+        {comments.map((comment) => (
+          <div key={comment._id} className="mb-4 p-4 border rounded shadow-sm bg-white">
+            <div className="flex gap-3 items-start">
+              <Avatar src={comment.user.profile.avatar} icon={<Avatar />} />
+              <div>
+                <p className="font-medium">{comment.user.username}</p>
+                <p className="text-sm text-gray-700">{comment.content}</p>
+                {comment.replies && comment.replies.length > 0 && (
+                  <div className="ml-6 mt-2 border-l pl-3">
+                    {comment.replies.map((reply: any) => (
+                      <div key={reply._id} className="mb-2">
+                        <div className="flex gap-2 items-start">
+                          <Avatar src={reply.user.profile.avatar} icon={<Avatar />} size={24} />
+                          <div>
+                            <p className="font-medium text-sm">{reply.user.username}</p>
+                            <p className="text-sm text-gray-600">{reply.content}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
