@@ -28,9 +28,9 @@ const lessonSlice = createSlice({
                 state.loading = true;
             })
             .addCase(fetchLessons.fulfilled, (state, action) => {
-                console.log('[✅ lessons fetched]', action.payload); // 👈 log để kiểm tra
+                // console.log('[✅ lessons fetched]', action.payload.data); // 👈 log để kiểm tra
                 state.loading = false;
-                state.data = Array.isArray(action.payload) ? action.payload : [];
+                state.data = Array.isArray(action.payload.data) ? action.payload.data : [];
             })
 
             .addCase(fetchLessons.rejected, (state) => {

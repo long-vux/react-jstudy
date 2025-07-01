@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Card, Typography, Row, Col } from 'antd';
 import { GoogleOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@/hooks';
-import { login } from '@/features/user/userSlice';
+import { login } from '@/features/user/user-thunks';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 const { Title, Text } = Typography;

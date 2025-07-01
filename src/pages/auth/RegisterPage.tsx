@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import BackHomeButton from '@/components/ui/BackHomeButton';
 import { Button, Card, Typography, Row, Col, message } from 'antd';
 import { useAppDispatch, useAppSelector } from '@/hooks';
-import { register } from '@/features/user/userSlice';
+import { register } from '@/features/user/user-thunks';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 

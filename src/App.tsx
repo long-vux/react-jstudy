@@ -8,7 +8,7 @@ import MainRoutes from '@/routes/MainRoutes';
 import AdminRoutes from '@/routes/AdminRoutes';
 import AuthRoutes from './routes/AuthRoutes';
 import { useAppDispatch } from '@/hooks';
-import { fetchUserProfile } from '@/features/user/userSlice';
+import { fetchUserProfile } from '@/features/user/user-thunks';
 
 dayjs.locale('vi');
 

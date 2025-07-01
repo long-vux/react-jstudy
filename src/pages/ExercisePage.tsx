@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { getExerciseById, submitCode } from '@/features/exercise/exerciseSlice';
+import CommentSection from '@/components/ui/CommentSection';
 import Editor from '@monaco-editor/react';
 import { Button, Card, Spin } from 'antd';
 
@@ -15,7 +16,9 @@ const ExercisePage = () => {
   const [results, setResults] = useState<any[]>([]);
 
   useEffect(() => {
-    if (id) dispatch(getExerciseById(id));
+    if (id) {
+      dispatch(getExerciseById(id));
+    }
   }, [id, dispatch]);
 
   useEffect(() => {
@@ -78,6 +81,8 @@ const ExercisePage = () => {
           ))}
         </div>
       )}
+
+      <CommentSection exerciseId={id || ''} />
     </div>
   );
 };
