@@ -9,7 +9,6 @@ import Footer from '../main/Footer';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 
 const { Content, Sider } = Layout;
-
 const LessonLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const dispatch = useAppDispatch();
