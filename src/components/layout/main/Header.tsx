@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Input, Button, Dropdown, Avatar } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@/hooks';
-import { logout } from '@/features/user/userSlice';
+import { logout } from '@/features/user/user-slice';
 
 const Header = () => {
     const user = useAppSelector((state) => state.user.user);

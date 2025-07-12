@@ -2,7 +2,7 @@ import { Layout, Tooltip } from 'antd';
 import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useAppDispatch } from '@/hooks';
-import { fetchLessons } from '@/features/lesson/lessonSlice';
+import { fetchLessons } from '@/features/lesson/lesson-slice';
 import LessonSidebar from './LessonSidebar';
 import Header from '../main/Header';
 import Footer from '../main/Footer';

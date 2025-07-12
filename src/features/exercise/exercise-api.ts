@@ -1,4 +1,4 @@
-import axiosClient from '@/services/axiosClient';
+import axiosClient from '@/services/axios-client';
 
 
 const fetchExerciseById = async (id: string) => {

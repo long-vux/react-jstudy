@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/hooks';
-import { getExerciseById, submitCode } from '@/features/exercise/exerciseSlice';
+import { getExerciseById, submitCode } from '@/features/exercise/exercise-slice';
 import CommentSection from '@/components/ui/CommentSection';
 import Editor from '@monaco-editor/react';
-import { Button, Card, Spin } from 'antd';
+import { Button, Card, Spin, Avatar } from 'antd';
 
 const ExercisePage = () => {
   const { id } = useParams();
   const dispatch = useAppDispatch();
   const { current, loading } = useAppSelector((state) => state.exercise);
+  const { comments } = useAppSelector((state) => state.comment);
 
   const [code, setCode] = useState('');
   const [submitting, setSubmitting] = useState(false);
