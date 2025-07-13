@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/hooks';
-import { getExerciseById, submitCode } from '@/features/exercise/exercise-slice';
+import { getExerciseById, submitCode } from '@/features/exercise/exercise-thunks';
 import CommentSection from '@/components/ui/CommentSection';
 import Editor from '@monaco-editor/react';
-import { Button, Card, Spin, Avatar } from 'antd';
+import { Button, Card, Spin } from 'antd';
 
 const ExercisePage = () => {
   const { id } = useParams();
   const dispatch = useAppDispatch();
   const { current, loading } = useAppSelector((state) => state.exercise);
-  const { comments } = useAppSelector((state) => state.comment);
 
   const [code, setCode] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -30,6 +29,7 @@ const ExercisePage = () => {
     if (!id || !code) return;
     setSubmitting(true);
     const res = await dispatch(submitCode({ exerciseId: id, userCode: code }));
+
     setResults(res.payload.results);
     setSubmitting(false);
   };
