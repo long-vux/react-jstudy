@@ -4,6 +4,7 @@ import LessonLayout from '@/components/layout/lesson/LessonLayout';
 import HomePage from '@/pages/Home';
 import LessonPage from '@/pages/LessonPage';
 import ExercisePage from '@/pages/ExercisePage';
+import ProfilePage from '@/pages/ProfilePage';
 
 
 const MainRoutes = () => (
@@ -19,7 +20,7 @@ const MainRoutes = () => (
     <Route path="/exercise" element={<LessonLayout />}>
       <Route path=":id" element={<ExercisePage />} />
     </Route>
-
+    <Route path="/profile" element={<ProfilePage />} />
   </Routes>
 );
 

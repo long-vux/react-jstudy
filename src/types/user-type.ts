@@ -18,6 +18,10 @@ export interface UserData {
   status: string;
   profile: Profile;
   stats: UserStats;
+  verified: boolean;
+  createdAt: Date,
+  joinedAt: Date,
+  isVerified: boolean
 }
 
 export interface UserState {

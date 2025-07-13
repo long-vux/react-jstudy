@@ -1,78 +1,123 @@
-// === src/pages/ProfilePage.tsx ===
-import { useEffect, useState } from 'react';
-import { useAppSelector } from '../hooks';
-import CalendarHeatmap from 'react-calendar-heatmap';
-import 'react-calendar-heatmap/dist/styles.css';
-import { subDays } from 'date-fns';
-import axios from 'axios';
+import React from 'react';
+import { useAppSelector } from '@/hooks';
+import BackHomeButton from '@components/ui/BackHomeButton'
+import {
+  Avatar,
+  Button,
+  Card,
+  Descriptions,
+  Divider,
+  Tag,
+} from 'antd';
+import {
+  EditOutlined,
+  MailOutlined,
+  CheckCircleTwoTone,
+  ClockCircleTwoTone,
+} from '@ant-design/icons';
 
-const ProfilePage = () => {
+const ProfilePage: React.FC = () => {
   const { user } = useAppSelector((state) => state.user);
-  const [activityData, setActivityData] = useState<{ date: string; count: number }[]>([]);
 
-  const endDate = new Date();
-  const startDate = subDays(endDate, 365);
+  if (!user) {
+    return (
+      <div className="text-center text-red-500 mt-10">
+        Không tìm thấy thông tin người dùng.
+      </div>
+    );
+  }
 
-  useEffect(() => {
-    const fetchActivity = async () => {
-      if (!user?._id) return;
-      try {
-        const res = await axios.get(`http://localhost:5000/api/user/${user._id}/learning-activity`);
-        setActivityData(res.data); // giả sử backend trả về [{ date: '2025-06-25', count: 2 }, ...]
-      } catch (err) {
-        console.error('Lỗi khi lấy dữ liệu hoạt động:', err);
-      }
-    };
-
-    fetchActivity();
-  }, [user?._id]);
+  const {
+    username,
+    email,
+    joinedAt,
+    isVerified,
+    profile,
+    stats,
+  } = user;
 
   return (
-    <div className="p-8">
-      <div className="flex flex-col md:flex-row gap-8 items-start">
-        {/* Avatar + basic info */}
-        <div className="text-center">
-          <img
-            src={user?.profile?.avatar || 'https://via.placeholder.com/120'}
-            alt="avatar"
-            className="w-28 h-28 rounded-full mx-auto mb-4"
+    <div className="max-w-5xl mx-auto mt-10">
+      <BackHomeButton/>
+      {/* Banner */}
+      <div className="relative h-40 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-md ">
+        {/* Avatar + Info */}
+        <div className="absolute left-6 bottom-[-48px] flex items-center gap-4">
+          <Avatar
+            src={profile?.avatar}
+            size={120 }
+            className="border-4 border-white shadow-md"
           />
-          <h2 className="text-xl font-bold">{user?.profile?.fullName}</h2>
-          <p className="text-gray-500">@{user?.username}</p>
-        </div>
-
-        {/* Heatmap */}
-        <div className="w-full">
-          <h2 className="text-lg font-semibold mb-2">Hoạt động học tập trong 12 tháng qua</h2>
-          <CalendarHeatmap
-            startDate={startDate}
-            endDate={endDate}
-            values={activityData}
-            classForValue={(value) => {
-              if (!value) return 'color-empty';
-              if (value.count >= 3) return 'color-scale-4';
-              if (value.count === 2) return 'color-scale-3';
-              if (value.count === 1) return 'color-scale-2';
-              return 'color-scale-1';
-            }}
-            tooltipDataAttrs={(value) => ({
-              ['data-tip']: value && value.date
-                ? `${value.date}: ${value.count} bài học`
-                : ''
-            })}
-            showWeekdayLabels
-          />
+          <div className="text-white mb-10">
+            <h2 className="text-xl font-semibold">{profile?.fullName}</h2>
+            <p className="text-sm text-gray-200">@{username}</p>
+          </div>
         </div>
       </div>
 
-      {/* Thống kê cá nhân */}
-      <div className="mt-10">
-        <h2 className="text-2xl font-bold mb-4">Thống kê cá nhân</h2>
-        <p className="text-red-600 text-xl">Bạn đã học được 120 bài</p>
-        <p className="text-red-600 text-xl">Bài học hiện tại là: Promise</p>
-        <p className="text-red-600 text-xl">Tổng số điểm: 1000</p>
-        <p className="text-red-600 text-xl">Xếp hạng cộng đồng: 2</p>
-      </div>
+
+      {/* Main Card */}
+      <Card className="mt-20 p-6 rounded-lg shadow-md">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Left Column - Thông tin cơ bản */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Thông tin cá nhân
+            </h3>
+            <Descriptions column={1} size="middle">
+              <Descriptions.Item label="Email">
+                <span className="flex items-center gap-2">
+                  <MailOutlined /> {email}
+                </span>
+              </Descriptions.Item>
+              <Descriptions.Item label="Ngày tham gia">
+                {new Date(joinedAt).toLocaleDateString()}
+              </Descriptions.Item>
+              <Descriptions.Item label="Trạng thái">
+                {isVerified ? (
+                  <Tag icon={<CheckCircleTwoTone twoToneColor="#52c41a" />} color="success">
+                    Đã xác thực
+                  </Tag>
+                ) : (
+                  <Tag icon={<ClockCircleTwoTone twoToneColor="#faad14" />} color="warning">
+                    Chưa xác thực
+                  </Tag>
+                )}
+              </Descriptions.Item>
+            </Descriptions>
+            <div className="mt-4">
+              <Button type="primary" icon={<EditOutlined />}>
+                Cập nhật hồ sơ
+              </Button>
+            </div>
+          </div>
+
+          {/* Right Column - Thống kê */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Thành tích học tập
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <Card className="text-center border border-gray-200">
+                <p className="text-sm text-gray-500">Tổng điểm</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {stats?.totalPoints ?? 0}
+                </p>
+              </Card>
+              <Card className="text-center border border-gray-200">
+                <p className="text-sm text-gray-500">Bài đã giải</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {stats?.solvedExercises ?? 0}
+                </p>
+              </Card>
+            </div>
+          </div>
+        </div>
+        <Divider className="mt-8" />
+        <p className="text-center text-gray-500 text-sm">
+          JStudy • Cùng bạn chinh phục JavaScript ✨
+        </p>
+      </Card>
     </div>
   );
 };
