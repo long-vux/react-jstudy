@@ -25,3 +25,15 @@ export const createComment = createAsyncThunk(
         }
     }
 );
+
+export const updateComment = createAsyncThunk(
+    'comment/updateComment',
+    async ({ commentId, content }: { commentId: string; content: string }, { rejectWithValue }) => {
+        try {
+            const res = await commentApi.updateComment(commentId, content);
+            return res.data; // Giả sử API trả về comment đã được cập nhật
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to update comment');
+        }
+    }
+);

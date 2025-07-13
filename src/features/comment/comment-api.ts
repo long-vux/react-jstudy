@@ -15,6 +15,11 @@ const commentApi = {
     return response.data;
   },
 
+  updateComment: async (commentId: string, content: string) => {
+    const response = await axiosClient.patch(`/comment/update-comment/${commentId}`, { content });
+    return response.data;
+  }
+
 };
 
 export default commentApi;

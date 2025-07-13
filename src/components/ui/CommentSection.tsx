@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '@/hooks/index';
-import { fetchCommentsByExerciseId, createComment } from '@/features/comment/comment-thunks';
+import { fetchCommentsByExerciseId, createComment, updateComment } from '@/features/comment/comment-thunks';
 import { Avatar, Button, Input, message } from 'antd';
 import { EditOutlined, DeleteOutlined, MessageOutlined } from '@ant-design/icons';
 import { Comment } from '@/types/comment-type';
@@ -9,6 +9,222 @@ interface CommentSectionProps {
     exerciseId: string;
 }
 
+// --- CommentReplyForm Component ---
+interface CommentReplyFormProps {
+    onSubmit: (content: string) => Promise<void>; 
+    onCancel: () => void;
+    creatingComment: boolean;
+    currentUser: any | null; 
+}
+
+// --- CommentItem Component ---
+interface CommentItemProps {
+    comment: Comment;
+    isReply?: boolean;
+    currentUser: any | null; // Pass currentUser down
+    dispatch: ReturnType<typeof useAppDispatch>; // Pass dispatch down
+    creatingComment: boolean;
+    updatingComment: boolean;
+    deletingComment: boolean;
+    exerciseId: string; // Pass exerciseId for replies
+}
+
+const CommentReplyForm: React.FC<CommentReplyFormProps> = ({ onSubmit, onCancel, creatingComment, currentUser }) => {
+    const [replyContent, setReplyContent] = useState('');
+
+    const handleSubmit = async () => {
+        if (!replyContent.trim()) {
+            message.warning('Nội dung trả lời không được để trống.');
+            return;
+        }
+        await onSubmit(replyContent);
+        setReplyContent(''); // Clear input on successful submit
+    };
+
+    return (
+        <div className="mt-4 flex flex-col gap-2">
+            <Input
+                placeholder="Viết trả lời của bạn..."
+                value={replyContent}
+                onChange={(e) => setReplyContent(e.target.value)}
+                disabled={creatingComment}
+                className="rounded-md p-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <div className="flex items-center justify-end gap-2">
+                <Button type="default" onClick={onCancel} disabled={creatingComment}>
+                    Hủy
+                </Button>
+                <Button
+                    type="primary"
+                    onClick={handleSubmit}
+                    loading={creatingComment}
+                    disabled={!currentUser || !replyContent.trim() || creatingComment}
+                    className="bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+                >
+                    Gửi
+                </Button>
+            </div>
+        </div>
+    );
+};
+
+const CommentItem: React.FC<CommentItemProps> = React.memo(
+    ({ comment, isReply = false, currentUser, dispatch, creatingComment, updatingComment, deletingComment, exerciseId }) => {
+        const isOwner = currentUser && currentUser._id === comment.user._id;
+        const displayName = isOwner ? 'Bạn' : comment.user?.profile?.fullName;
+        const avatarSrc = comment.user?.profile?.avatar || 'https://placehold.co/40x40/cccccc/000000?text=AV';
+
+        const [isReplying, setIsReplying] = useState(false);
+        const [isEditing, setIsEditing] = useState(false);
+        const [editContent, setEditContent] = useState(comment.content);
+
+        const handleUpdateComment = async () => {
+            if (!editContent.trim()) {
+                message.warning('Nội dung bình luận không được để trống.');
+                return;
+            }
+            try {
+                await dispatch(updateComment({ commentId: comment._id, content: editContent })).unwrap();
+                message.success('Bình luận đã được cập nhật!');
+                setIsEditing(false); // Hide edit form on success
+            } catch (err) {
+                // Error is handled by useEffect in parent CommentSection
+            }
+        };
+
+        
+
+        const handleReplySubmit = async (content: string) => {
+            if (!currentUser) {
+                message.warning('Vui lòng đăng nhập để trả lời.');
+                return;
+            }
+            try {
+                await dispatch(
+                    createComment({
+                        content,
+                        exerciseId,
+                        parentCommentId: comment._id,
+                    })
+                ).unwrap();
+                message.success('Trả lời đã được gửi!');
+                setIsReplying(false); // Hide reply form on success
+            } catch (err) {
+                // Error is handled by useEffect in parent CommentSection
+            }
+        };
+
+
+        return (
+            <div className={`mb-4 p-4 border rounded-lg shadow-sm bg-white ${isReply ? 'ml-6 border-l pl-3' : ''}`}>
+                <div className="flex gap-3 items-start">
+                    <Avatar src={avatarSrc} size={isReply ? 32 : 40} />
+                    <div className="flex-1">
+                        <p className="font-medium text-gray-800">{displayName}</p>
+                        {isEditing ? (
+                            <div className="mt-2">
+                                <Input.TextArea
+                                    rows={2}
+                                    value={editContent}
+                                    onChange={(e) => setEditContent(e.target.value)}
+                                    className="rounded-md p-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                                <div className="flex gap-2 mt-2">
+                                    <Button
+                                        type="primary"
+                                        loading={updatingComment}
+                                        onClick={handleUpdateComment}
+                                        className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+                                        disabled={!editContent.trim()}
+                                    >
+                                        Lưu
+                                    </Button>
+                                    <Button
+                                        onClick={() => setIsEditing(false)}
+                                        className="px-3 py-1 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
+                                        disabled={updatingComment}
+                                    >
+                                        Hủy
+                                    </Button>
+                                </div>
+                            </div>
+                        ) : (
+                            <p className="text-sm text-gray-700 break-words">{comment.content}</p>
+                        )}
+
+                        <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                            <span>{new Date(comment.createdAt).toLocaleString()}</span>
+                            {currentUser && comment.parentComment === null && !isEditing && ( // Only show reply if not editing
+                                <Button
+                                    type="link"
+                                    icon={<MessageOutlined />}
+                                    onClick={() => setIsReplying((prev) => !prev)} // Toggle reply form visibility
+                                    className="text-blue-500 hover:text-blue-700"
+                                >
+                                    Trả lời
+                                </Button>
+                            )}
+                            {isOwner && !isEditing && ( // Only show edit/delete if not already editing
+                                <>
+                                    <Button
+                                        type="link"
+                                        icon={<EditOutlined />}
+                                        onClick={() => {
+                                            setIsEditing(true);
+                                            setIsReplying(false); // Hide reply form if open
+                                            setEditContent(comment.content); // Set current content for editing
+                                        }}
+                                        className="text-yellow-600 hover:text-yellow-700"
+                                    >
+                                        Sửa
+                                    </Button>
+                                    <Button
+                                        type="link"
+                                        icon={<DeleteOutlined />}
+                                        loading={deletingComment}
+                                        onClick={() => {}} // Call delete handler
+                                        className="text-red-600 hover:text-red-700"
+                                    >
+                                        Xóa
+                                    </Button>
+                                </>
+                            )}
+                        </div>
+
+                        {comment.replies && comment.replies.length > 0 && (
+                            <div className="mt-4">
+                                {comment.replies.map((reply) => (
+                                    <CommentItem
+                                        key={reply._id + reply.updatedAt}
+                                        comment={reply}
+                                        isReply
+                                        currentUser={currentUser}
+                                        dispatch={dispatch}
+                                        creatingComment={creatingComment}
+                                        updatingComment={updatingComment}
+                                        deletingComment={deletingComment}
+                                        exerciseId={exerciseId}
+                                    />
+                                ))}
+                            </div>
+                        )}
+
+                        {isReplying && ( // Conditionally render reply form based on local state
+                            <CommentReplyForm
+                                onSubmit={handleReplySubmit}
+                                onCancel={() => setIsReplying(false)}
+                                creatingComment={creatingComment}
+                                currentUser={currentUser}
+                            />
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+);
+
+// --- CommentSection Component ---
 const CommentSection: React.FC<CommentSectionProps> = ({ exerciseId }) => {
     const dispatch = useAppDispatch();
     const { comments, loading, creatingComment, updatingComment, deletingComment, error } = useAppSelector(
@@ -16,12 +232,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ exerciseId }) => {
     );
     const { user: currentUser } = useAppSelector((state) => state.user);
 
-    console.log('comments:', comments);
-
     const [newCommentContent, setNewCommentContent] = useState('');
-    const [replyingTo, setReplyingTo] = useState<string | null>(null);
-    const [editingComment, setEditingComment] = useState<Comment | null>(null);
-    const [editContent, setEditContent] = useState('');
 
     useEffect(() => {
         if (exerciseId) {
@@ -35,19 +246,13 @@ const CommentSection: React.FC<CommentSectionProps> = ({ exerciseId }) => {
         }
     }, [error]);
 
-    const handleCreateComment = async ({
-        content,
-        parentCommentId,
-    }: {
-        content: string;
-        parentCommentId?: string;
-    }) => {
+    const handleCreateMainComment = async () => {
         if (!currentUser) {
             message.warning('Vui lòng đăng nhập để bình luận.');
             return;
         }
 
-        if (!content.trim()) {
+        if (!newCommentContent.trim()) {
             message.warning('Nội dung bình luận không được để trống.');
             return;
         }
@@ -55,20 +260,17 @@ const CommentSection: React.FC<CommentSectionProps> = ({ exerciseId }) => {
         try {
             await dispatch(
                 createComment({
-                    content,
+                    content: newCommentContent,
                     exerciseId,
-                    parentCommentId,
+                    parentCommentId: undefined, // This is a top-level comment
                 })
             ).unwrap();
 
-            if (parentCommentId) {
-                setReplyingTo(null);
-            } else {
-                setNewCommentContent('');
-            }
-
-            message.success(parentCommentId ? 'Trả lời đã được gửi!' : 'Bình luận đã được gửi!');
-        } catch (err) {}
+            setNewCommentContent(''); // Clear the input after successful submission
+            message.success('Bình luận đã được gửi!');
+        } catch (err) {
+            // Error is handled by useEffect
+        }
     };
 
     const renderCommentForm = () => (
@@ -82,148 +284,14 @@ const CommentSection: React.FC<CommentSectionProps> = ({ exerciseId }) => {
             />
             <Button
                 type="primary"
-                onClick={() =>
-                    handleCreateComment({ content: newCommentContent })
-                }
+                onClick={handleCreateMainComment}
                 loading={creatingComment}
-                disabled={!currentUser || !newCommentContent.trim()}
+                disabled={!currentUser || !newCommentContent.trim() || creatingComment}
                 className="self-end px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
             >
                 Gửi
             </Button>
         </div>
-    );
-
-    const CommentItem: React.FC<{ comment: Comment; isReply?: boolean }> = React.memo(
-        ({ comment, isReply = false }) => {
-            const isOwner = currentUser && currentUser._id === comment.user._id;
-            const displayName = isOwner ? 'Bạn' : comment.user?.profile?.fullName;
-            const avatarSrc =
-                comment.user?.profile?.avatar || 'https://placehold.co/40x40/cccccc/000000?text=AV';
-
-            const [replyContent, setReplyContent] = useState('');
-
-            return (
-                <div className={`mb-4 p-4 border rounded-lg shadow-sm bg-white ${isReply ? 'ml-6 border-l pl-3' : ''}`}>
-                    <div className="flex gap-3 items-start">
-                        <Avatar src={avatarSrc} size={isReply ? 32 : 40} />
-                        <div className="flex-1">
-                            <p className="font-medium text-gray-800">{displayName}</p>
-                            {editingComment?._id === comment._id ? (
-                                <div className="mt-2">
-                                    <Input.TextArea
-                                        rows={2}
-                                        value={editContent}
-                                        onChange={(e) => setEditContent(e.target.value)}
-                                        className="rounded-md p-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                                    />
-                                    <div className="flex gap-2 mt-2">
-                                        <Button
-                                            type="primary"
-                                            loading={updatingComment}
-                                            className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700"
-                                        >
-                                            Lưu
-                                        </Button>
-                                        <Button
-                                            onClick={() => setEditingComment(null)}
-                                            className="px-3 py-1 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
-                                        >
-                                            Hủy
-                                        </Button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <p className="text-sm text-gray-700 break-words">{comment.content}</p>
-                            )}
-
-                            <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                                <span>{new Date(comment.createdAt).toLocaleString()}</span>
-                                {currentUser && comment.parentComment === null && (
-                                    <Button
-                                        type="link"
-                                        icon={<MessageOutlined />}
-                                        onClick={() => {
-                                            setReplyingTo(comment._id);
-                                        }}
-                                        className="text-blue-500 hover:text-blue-700"
-                                    >
-                                        Trả lời
-                                    </Button>
-                                )}
-                                {isOwner && (
-                                    <>
-                                        <Button
-                                            type="link"
-                                            icon={<EditOutlined />}
-                                            onClick={() => {
-                                                setEditingComment(comment);
-                                                setEditContent(comment.content);
-                                            }}
-                                            className="text-yellow-600 hover:text-yellow-700"
-                                        >
-                                            Sửa
-                                        </Button>
-                                        <Button
-                                            type="link"
-                                            icon={<DeleteOutlined />}
-                                            loading={deletingComment}
-                                            className="text-red-600 hover:text-red-700"
-                                        >
-                                            Xóa
-                                        </Button>
-                                    </>
-                                )}
-                            </div>
-
-                            {comment.replies && comment.replies.length > 0 && (
-                                <div className="mt-4">
-                                    {comment.replies.map((reply) => (
-                                        <CommentItem key={reply._id} comment={reply} isReply />
-                                    ))}
-                                </div>
-                            )}
-
-                            {replyingTo === comment._id && (
-                                <div className="mt-4 flex flex-col gap-2">
-                                    <Input
-                                        placeholder="Viết trả lời của bạn..."
-                                        value={replyContent}
-                                        onChange={(e) => setReplyContent(e.target.value)}
-                                        disabled={creatingComment}
-                                        className="rounded-md p-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                                    />
-                                    <div className="flex items-center justify-end gap-2">
-                                        <Button
-                                            type="default"
-                                            onClick={() => {
-                                                setReplyingTo(null);
-                                            }}
-                                        >
-                                            Hủy
-                                        </Button>
-                                        <Button
-                                            type="primary"
-                                            onClick={() =>
-                                                handleCreateComment({
-                                                    content: replyContent,
-                                                    parentCommentId: comment._id,
-                                                })
-                                            }
-                                            loading={creatingComment}
-                                            disabled={!currentUser || !replyContent.trim()}
-                                            className="bg-blue-600 text-white hover:bg-blue-700"
-                                        >
-                                            Gửi
-                                        </Button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            );
-        }
     );
 
     return (
@@ -251,7 +319,16 @@ const CommentSection: React.FC<CommentSectionProps> = ({ exerciseId }) => {
 
             <div className="space-y-6">
                 {comments.map((comment) => (
-                    <CommentItem key={comment._id} comment={comment} />
+                    <CommentItem
+                        key={comment._id}
+                        comment={comment}
+                        currentUser={currentUser}
+                        dispatch={dispatch}
+                        creatingComment={creatingComment}
+                        updatingComment={updatingComment}
+                        deletingComment={deletingComment}
+                        exerciseId={exerciseId} // Pass exerciseId down
+                    />
                 ))}
             </div>
         </div>

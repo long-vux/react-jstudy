@@ -3,6 +3,7 @@ import { Comment, CommentState } from '../../types/comment-type';
 import {
     fetchCommentsByExerciseId,
     createComment,
+    updateComment,
 } from './comment-thunks';
 
 const initialState: CommentState = {
@@ -59,6 +60,38 @@ const commentSlice = createSlice({
             })
             .addCase(createComment.rejected, (state, action) => {
                 state.creatingComment = false;
+                state.error = action.payload as string;
+            })
+
+            // Update Comment
+            .addCase(updateComment.pending, (state) => {
+                state.updatingComment = true;
+                state.error = null;
+            })
+            .addCase(updateComment.fulfilled, (state, action: PayloadAction<Comment>) => {
+                state.updatingComment = false;
+                const updatedComment = action.payload;
+
+                // find in top level comments (parent comment)
+                const parentIndex = state.comments.findIndex(c => c._id === updatedComment._id);
+                if (parentIndex !== -1) {
+                    state.comments[parentIndex].content = updatedComment.content;
+                    state.comments[parentIndex].updatedAt = updatedComment.updatedAt;
+                    return;
+                }
+
+                // find in replies (child comment)
+                for (const parent of state.comments) {
+                    const replyIndex = parent.replies?.findIndex(r => r._id === updatedComment._id);
+                    if (typeof replyIndex === 'number' && replyIndex !== -1 && parent.replies) {
+                        parent.replies[replyIndex].content = updatedComment.content;
+                        parent.replies[replyIndex].updatedAt = updatedComment.updatedAt;
+                        break;
+                    }
+                }
+            })
+            .addCase(updateComment.rejected, (state, action) => {
+                state.updatingComment = false;
                 state.error = action.payload as string;
             })
 
