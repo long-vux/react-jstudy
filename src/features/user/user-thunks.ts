@@ -1,9 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { 
-  loginAPI, 
-  registerAPI, 
-  fetchUserProfileAPI, 
-  updateProfileAPI 
+import {
+  loginAPI,
+  registerAPI,
+  fetchUserProfileAPI,
+  updateProfileAPI,
+  changePasswordAPI
 } from './user-api';
 
 export const login = createAsyncThunk(
@@ -59,12 +60,28 @@ export const updateUserProfile = createAsyncThunk(
   'user/updateProfile',
   async ({ userId, username, fullName }: { userId: string; username: string; fullName: string }, thunkAPI) => {
     try {
-      const res = await updateProfileAPI(userId, 
+      const res = await updateProfileAPI(userId,
         { username, fullName }
       );
       return res.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.res?.data?.message || 'Cập nhật thất bại');
+    }
+  }
+);
+
+export const changePassword = createAsyncThunk(
+  'user/changePassword',
+  async (
+    { currentPassword, newPassword }: { currentPassword: string; newPassword: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const res = await changePasswordAPI(currentPassword, newPassword);
+
+      return res.data.message; // Có thể trả success message
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || 'Đổi mật khẩu thất bại');
     }
   }
 );

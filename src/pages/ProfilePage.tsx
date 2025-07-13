@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useAppSelector } from '@/hooks';
 import BackHomeButton from '@components/ui/BackHomeButton'
 import ProfileUpdateModal from '@/components/model/ProfileUpdateModal';
+import ChangePasswordModal from '@/components/model/ChangePasswordModal';
+
 import {
   Avatar,
   Button,
@@ -20,7 +22,8 @@ import {
 const ProfilePage: React.FC = () => {
   const { user, updatingProfile } = useAppSelector((state) => state.user);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+
   if (!user || updatingProfile) {
     return (
       <div className="text-center text-gray-500 mt-10">
@@ -96,6 +99,16 @@ const ProfilePage: React.FC = () => {
                 Cập nhật hồ sơ
               </Button>
             </div>
+            <div className='mt-4'>
+              <Button
+                icon={<EditOutlined />}
+                onClick={() => setIsChangePasswordOpen(true)}
+              >
+
+                Đổi mật khẩu
+              </Button>
+            </div>
+
           </div>
 
           {/* Right Column - Thống kê */}
@@ -126,6 +139,7 @@ const ProfilePage: React.FC = () => {
       </Card>
 
       <ProfileUpdateModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <ChangePasswordModal open={isChangePasswordOpen} onClose={() => setIsChangePasswordOpen(false)} />
     </div>
   );
 };
