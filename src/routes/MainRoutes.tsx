@@ -6,7 +6,6 @@ import LessonPage from '@/pages/LessonPage';
 import ExercisePage from '@/pages/ExercisePage';
 import ProfilePage from '@/pages/ProfilePage';
 
-
 const MainRoutes = () => (
   <Routes>
     <Route path="/" element={<MainLayout />}>

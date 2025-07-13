@@ -1,5 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { loginAPI, registerAPI, fetchUserProfileAPI } from './user-api';
+import { 
+  loginAPI, 
+  registerAPI, 
+  fetchUserProfileAPI, 
+  updateProfileAPI 
+} from './user-api';
 
 export const login = createAsyncThunk(
   'user/login',
@@ -46,6 +51,20 @@ export const fetchUserProfile = createAsyncThunk(
       return res.data;
     } catch (err: any) {
       return thunkAPI.rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+export const updateUserProfile = createAsyncThunk(
+  'user/updateProfile',
+  async ({ userId, username, fullName }: { userId: string; username: string; fullName: string }, thunkAPI) => {
+    try {
+      const res = await updateProfileAPI(userId, 
+        { username, fullName }
+      );
+      return res.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.res?.data?.message || 'Cập nhật thất bại');
     }
   }
 );

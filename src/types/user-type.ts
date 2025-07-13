@@ -28,6 +28,7 @@ export interface UserState {
   user: UserData | null;
   token: string | null;
   loading: boolean;
+  updatingProfile: boolean;
   error: string | null;
   registerMessage: string | null;
 }

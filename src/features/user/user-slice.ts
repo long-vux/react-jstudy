@@ -1,11 +1,17 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { UserState } from '../../types/user-type';
-import { login, register, fetchUserProfile } from './user-thunks';
+import {
+  login,
+  register,
+  fetchUserProfile,
+  updateUserProfile
+} from './user-thunks';
 
 const initialState: UserState = {
   user: null,
   token: localStorage.getItem('token'),
   loading: false,
+  updatingProfile: false,
   error: null,
   registerMessage: null,
 };
@@ -64,7 +70,28 @@ const userSlice = createSlice({
       .addCase(fetchUserProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+
+      // Update User Profile
+      .addCase(updateUserProfile.pending, (state) => {
+        state.updatingProfile = true;
+        state.error = null;
+      })
+      .addCase(updateUserProfile.fulfilled, (state, action) => {
+        state.updatingProfile = false;
+
+        if (state.user) {
+          state.user.username = action.payload.username;
+          if (state.user.profile) {
+            state.user.profile.fullName = action.payload.profile?.fullName;
+          }
+        }
+      })
+      .addCase(updateUserProfile.rejected, (state, action) => {
+        state.updatingProfile = false;
+        state.error = action.payload as string;
       });
+
   },
 });
 

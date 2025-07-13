@@ -14,3 +14,8 @@ export const fetchUserProfileAPI = async (id: string) => {
   const res = await axiosClient.get(`/user/${id}`);
   return res.data; // contains user profile
 };
+
+export const updateProfileAPI = async (id: string, data: any) => {
+  const res = await axiosClient.put(`/user/update/${id}`, data);
+  return res.data; // contains updated user profile
+};

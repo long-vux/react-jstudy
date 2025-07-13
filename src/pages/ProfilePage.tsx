@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAppSelector } from '@/hooks';
 import BackHomeButton from '@components/ui/BackHomeButton'
+import ProfileUpdateModal from '@/components/model/ProfileUpdateModal';
 import {
   Avatar,
   Button,
@@ -17,12 +18,13 @@ import {
 } from '@ant-design/icons';
 
 const ProfilePage: React.FC = () => {
-  const { user } = useAppSelector((state) => state.user);
-
-  if (!user) {
+  const { user, updatingProfile } = useAppSelector((state) => state.user);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  if (!user || updatingProfile) {
     return (
-      <div className="text-center text-red-500 mt-10">
-        Không tìm thấy thông tin người dùng.
+      <div className="text-center text-gray-500 mt-10">
+        Đang tải hồ sơ người dùng...
       </div>
     );
   }
@@ -38,14 +40,14 @@ const ProfilePage: React.FC = () => {
 
   return (
     <div className="max-w-5xl mx-auto mt-10">
-      <BackHomeButton/>
+      <BackHomeButton />
       {/* Banner */}
       <div className="relative h-40 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-md ">
         {/* Avatar + Info */}
         <div className="absolute left-6 bottom-[-48px] flex items-center gap-4">
           <Avatar
             src={profile?.avatar}
-            size={120 }
+            size={120}
             className="border-4 border-white shadow-md"
           />
           <div className="text-white mb-10">
@@ -86,7 +88,11 @@ const ProfilePage: React.FC = () => {
               </Descriptions.Item>
             </Descriptions>
             <div className="mt-4">
-              <Button type="primary" icon={<EditOutlined />}>
+              <Button
+                type="primary"
+                icon={<EditOutlined />}
+                onClick={() => setIsModalOpen(true)}
+              >
                 Cập nhật hồ sơ
               </Button>
             </div>
@@ -118,6 +124,8 @@ const ProfilePage: React.FC = () => {
           JStudy • Cùng bạn chinh phục JavaScript ✨
         </p>
       </Card>
+
+      <ProfileUpdateModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 };
