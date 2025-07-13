@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '@/hooks/index';
-import { fetchCommentsByExerciseId, createComment, updateComment } from '@/features/comment/comment-thunks';
+import { 
+    fetchCommentsByExerciseId, 
+    createComment, 
+    updateComment,
+    deleteComment,
+} from '@/features/comment/comment-thunks';
 import { Avatar, Button, Input, message } from 'antd';
 import { EditOutlined, DeleteOutlined, MessageOutlined } from '@ant-design/icons';
 import { Comment } from '@/types/comment-type';
@@ -11,10 +16,10 @@ interface CommentSectionProps {
 
 // --- CommentReplyForm Component ---
 interface CommentReplyFormProps {
-    onSubmit: (content: string) => Promise<void>; 
+    onSubmit: (content: string) => Promise<void>;
     onCancel: () => void;
     creatingComment: boolean;
-    currentUser: any | null; 
+    currentUser: any | null;
 }
 
 // --- CommentItem Component ---
@@ -92,7 +97,14 @@ const CommentItem: React.FC<CommentItemProps> = React.memo(
             }
         };
 
-        
+        const handleDeleteComment = async () => {
+            try {
+                await dispatch(deleteComment(comment._id)).unwrap();
+                message.success('Xóa bình luận thành công!');
+            } catch (err) {
+                message.error('Xóa bình luận thất bại!');
+            }
+        };
 
         const handleReplySubmit = async (content: string) => {
             if (!currentUser) {
@@ -113,7 +125,6 @@ const CommentItem: React.FC<CommentItemProps> = React.memo(
                 // Error is handled by useEffect in parent CommentSection
             }
         };
-
 
         return (
             <div className={`mb-4 p-4 border rounded-lg shadow-sm bg-white ${isReply ? 'ml-6 border-l pl-3' : ''}`}>
@@ -182,7 +193,7 @@ const CommentItem: React.FC<CommentItemProps> = React.memo(
                                         type="link"
                                         icon={<DeleteOutlined />}
                                         loading={deletingComment}
-                                        onClick={() => {}} // Call delete handler
+                                        onClick={() => handleDeleteComment()} // Call delete handler
                                         className="text-red-600 hover:text-red-700"
                                     >
                                         Xóa

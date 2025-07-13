@@ -7,17 +7,22 @@ const commentApi = {
   },
 
   createComment: async (content: string, exerciseId: string, parentCommentId?: string) => {
-    const response = await axiosClient.post('/comment/create-comment', {
+    const res = await axiosClient.post('/comment/create-comment', {
       content,
       exerciseId,
       parentComment: parentCommentId, // parentComment will be null if it's a top-level comment
     });
-    return response.data;
+    return res.data;
   },
 
   updateComment: async (commentId: string, content: string) => {
-    const response = await axiosClient.patch(`/comment/update-comment/${commentId}`, { content });
-    return response.data;
+    const res = await axiosClient.patch(`/comment/update-comment/${commentId}`, { content });
+    return res.data;
+  },
+
+  deleteComment: async (commentId: string) => {
+    const res = await axiosClient.delete(`/comment/delete-comment/${commentId}`);
+    return res.data;
   }
 
 };

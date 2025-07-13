@@ -4,6 +4,7 @@ import {
     fetchCommentsByExerciseId,
     createComment,
     updateComment,
+    deleteComment,
 } from './comment-thunks';
 
 const initialState: CommentState = {
@@ -94,6 +95,36 @@ const commentSlice = createSlice({
                 state.updatingComment = false;
                 state.error = action.payload as string;
             })
+
+            // Delete Comment
+            .addCase(deleteComment.pending, (state) => {
+                state.deletingComment = true;
+                state.error = null;
+            })
+            .addCase(deleteComment.fulfilled, (state, action: PayloadAction<string>) => {
+                state.deletingComment = false;
+                const deletedId = action.payload;
+
+                // delete if it is a parent comment
+                const parentIndex = state.comments.findIndex(c => c._id === deletedId);
+                if (parentIndex !== -1) {
+                    state.comments.splice(parentIndex, 1);
+                    return;
+                }
+
+                // delete if it is a reply
+                for (const parent of state.comments) {
+                    const replyIndex = parent.replies?.findIndex(r => r._id === deletedId);
+                    if (replyIndex !== undefined && replyIndex !== -1 && parent.replies) {
+                        parent.replies.splice(replyIndex, 1);
+                        break;
+                    }
+                }
+            })
+            .addCase(deleteComment.rejected, (state, action) => {
+                state.deletingComment = false;
+                state.error = action.payload as string;
+            });
 
     },
 });
